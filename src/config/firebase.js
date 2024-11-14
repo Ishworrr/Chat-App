@@ -10,6 +10,7 @@ import { getStorage } from "firebase/storage";
 import { toast } from "react-toastify";
 import { getAuth } from "firebase/auth/cordova";
 
+//gs
 const firebaseConfig = {
   apiKey: "AIzaSyBfQJZmMRDRhBTcpCOD4WLi7vn8CJtG4eE",
   authDomain: "chat-app-gs-a7831.firebaseapp.com",
@@ -18,6 +19,36 @@ const firebaseConfig = {
   messagingSenderId: "750768140912",
   appId: "1:750768140912:web:9904949bdcf27232893ab5",
 };
+
+//2
+// const firebaseConfig = {
+//   apiKey: "AIzaSyAOAHN1hoaWiyhdLz-ttLNmElORgRJq1tw",
+//   authDomain: "chat-app-2-6abf1.firebaseapp.com",
+//   projectId: "chat-app-2-6abf1",
+//   storageBucket: "chat-app-2-6abf1.firebasestorage.app",
+//   messagingSenderId: "540197324535",
+//   appId: "1:540197324535:web:18818b9e440855b33a35f2",
+// };
+
+//react-chat
+// const firebaseConfig = {
+//   apiKey: "AIzaSyD47_U4Tpn7W6F4EnppyoYJkwEpZCI_1Co",
+//   authDomain: "reactchat-6881c.firebaseapp.com",
+//   projectId: "reactchat-6881c",
+//   storageBucket: "reactchat-6881c.appspot.com",
+//   messagingSenderId: "382456954332",
+//   appId: "1:382456954332:web:c4896788a420c68effa319",
+// };
+
+//space
+// const firebaseConfig = {
+//   apiKey: "AIzaSyBcUurdp2yhAx9IicY6i-T2Jl8rGrCGtDs",
+//   authDomain: "chat-app-3-25816.firebaseapp.com",
+//   projectId: "chat-app-3-25816",
+//   storageBucket: "chat-app-3-25816.firebasestorage.app",
+//   messagingSenderId: "480350437779",
+//   appId: "1:480350437779:web:40a5d926309b8bf5a86866",
+// };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -38,7 +69,7 @@ const signup = async (username, email, password) => {
       lastSeen: Date.now(),
     });
     await setDoc(doc(db, "chats", user.uid), {
-      chatData: [],
+      chatsData: [],
     });
   } catch (error) {
     console.log(error);
