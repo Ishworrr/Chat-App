@@ -105,3 +105,18 @@
   margin-bottom: 30px;
   border-radius: 10px;
 }
+.chat-user .arrow {
+  display: none;
+}
+@media (max-width: 900px) {
+  .chat-box {
+    width: 100%;
+    justify-content: center;
+  }
+  .chat-user .arrow {
+    display: block;
+  }
+  .chat-user .help {
+    display: none;
+  }
+}

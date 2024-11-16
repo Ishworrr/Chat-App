@@ -3,17 +3,31 @@ import "./ChatBox.css";
 import assets from "../../assets/assets";
 import { useContext } from "react";
 import { AppContext } from "../../context/AppContext";
-import { arrayUnion, getDoc, onSnapshot, updateDoc } from "firebase/firestore";
+import {
+  arrayUnion,
+  doc,
+  getDoc,
+  onSnapshot,
+  updateDoc,
+} from "firebase/firestore";
 import { toast } from "react-toastify";
 import { db } from "../../config/firebase";
 const ChatBox = () => {
-  const { userData, messagesId, chatUser, messages, setMessages } =
-    useContext(AppContext);
+  const {
+    userData,
+    messagesId,
+    chatUser,
+    messages,
+    setMessages,
+    chatVisible,
+    setChatVisible,
+  } = useContext(AppContext);
   const [input, setInput] = useState("");
   const sendMessage = async () => {
     try {
       if (input && messagesId) {
-        await updateDoc((db, "messages", messagesId), {
+        ne;
+        await updateDoc(doc(db, "messages", messagesId), {
           messages: arrayUnion({
             sId: userData.id,
             text: input,
@@ -29,17 +43,27 @@ const ChatBox = () => {
             const chatIndex = userChatData.chatsData.findIndex(
               (c) => c.messageId === messagesId
             );
-            userChatData.chatsData[chatIndex].lastMessage = input.slice(0, 30);
-            userChatData.chatsData[chatIndex].updatedAt = Date.now();
+            // userChatData.chatsData[chatIndex].lastMessage = input.slice(0, 30);
+            // userChatData.chatsData[chatIndex].updatedAt = Date.now();
 
-            if (userChatData.chatsData[chatIndex].rId === userData.id) {
-              userChatData.chatsData[chatIndex].messageSeen = false;
+            // if (userChatData.chatsData[chatIndex].rId === userData.id) {
+            //   userChatData.chatsData[chatIndex].messageSeen = false;
+            // }
+            if (chatIndex !== -1) {
+              userChatData.chatsData[chatIndex].lastMessage = input.slice(
+                0,
+                30
+              );
+              userChatData.chatsData[chatIndex].updatedAt = Date.now();
+              userChatData.chatsData[chatIndex].messageSeen =
+                userChatData.chatsData[chatIndex].rId !== userData.id;
+              await updateDoc(userChatsRef, {
+                chatsData: userChatData.chatsData,
+              });
             }
-            await updateDoc(userChatsRef, {
-              chatsData: userChatData.chatsData,
-            });
           }
         });
+        toast.success("Message sent successfully!");
       }
     } catch (error) {
       console.log(error);
@@ -55,7 +79,7 @@ const ChatBox = () => {
         await updateDoc((db, "messages", messagesId), {
           messages: arrayUnion({
             sId: userData.id,
-            imgae: fileUrl,
+            image: fileUrl,
             createdAt: new Date(),
           }),
         });
@@ -85,7 +109,7 @@ const ChatBox = () => {
     }
   };
 
-  const convertTimeStamp = (timeStamp) => {
+  const convertTimestamp = (timeStamp) => {
     let date = timeStamp.toDate();
     const hour = date.getHours();
     const minute = date.getMinutes();
@@ -109,7 +133,7 @@ const ChatBox = () => {
   }, [messagesId]);
 
   return chatUser ? (
-    <div className="chat-box">
+    <div className={`chat-box ${chatVisible ? "" : "hidden"}`}>
       <div className="chat-user">
         <img src={chatUser.userData.avatar} alt="" />
         <p>
@@ -119,6 +143,12 @@ const ChatBox = () => {
           ) : null}
         </p>
         <img src={assets.help_icon} className="help" alt="" />
+        <img
+          onClick={() => setChatVisible(false)}
+          src={assets.arrow_icon}
+          className="arrow"
+          alt=""
+        />
       </div>
 
       <div className="chat-msg">
@@ -128,11 +158,11 @@ const ChatBox = () => {
             className={msg.sId === userData.id ? "s-msg" : "r-msg"}
           >
             {msg["image"] ? (
-              <img src={msg.image} alt="" />
+              <img className="msg-img" src={msg.image} alt="" />
             ) : (
-              <p className="msg">{msg.useContext}</p>
+              <p className="msg">{msg.text}</p>
             )}
-            <p className="msg">{msg.text}</p>
+
             <div>
               <img
                 src={
@@ -142,7 +172,7 @@ const ChatBox = () => {
                 }
                 alt=""
               />
-              <p>{convertTimeStamp(msg.createdAt)}</p>
+              <p>{convertTimestamp(msg.createdAt)}</p>
             </div>
           </div>;
         })}
@@ -168,7 +198,7 @@ const ChatBox = () => {
       </div>
     </div>
   ) : (
-    <div className="chat-welcome">
+    <div className={`chat-welcome ${chatVisible ? "" : "hidden"}`}>
       <img src={assets.logo_icon} alt="" />
     </div>
   );

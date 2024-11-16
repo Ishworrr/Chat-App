@@ -23,7 +23,9 @@ const RightSidebar = () => {
       <div className="rs-profile">
         <img src={chatUser.userData.avatar} alt="" />
         <h2>
-          {Date.now() - chatUser.userData.lastSeen}
+          {Date.now() - chatUser.userData.lastSeen <= 70000 ? (
+            <img src={assets.green_dot} className="dot" alt="" />
+          ) : null}
           {chatUser.userData.name}{" "}
           <img src={assets.green_dot} className="dot" />
         </h2>
