@@ -2,12 +2,16 @@
   "name": "full-stack-chat-react-js-and-firebase",
   "private": true,
   "version": "0.0.0",
+  "homepage": "https://ishworrr.github.io/Functional-Chat-App-using-firebase-React",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build": "vite build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build"
+
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.679.0",
@@ -33,6 +37,6 @@
     "eslint-plugin-react-refresh": "^0.4.12",
     "gh-pages": "^6.2.0",
     "globals": "^15.9.0",
-    "vite": "^5.4.8"
+    "vite": "^5.4.11"
   }
 }
