@@ -11,7 +11,6 @@
     "build": "vite build",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d build"
-
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.679.0",
