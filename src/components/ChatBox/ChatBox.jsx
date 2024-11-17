@@ -12,6 +12,7 @@ import {
 } from "firebase/firestore";
 import { toast } from "react-toastify";
 import { db } from "../../config/firebase";
+import upload from "../../lib/upload";
 const ChatBox = () => {
   const {
     userData,
@@ -23,10 +24,11 @@ const ChatBox = () => {
     setChatVisible,
   } = useContext(AppContext);
   const [input, setInput] = useState("");
+
   const sendMessage = async () => {
     try {
       if (input && messagesId) {
-        ne;
+        // ne;
         await updateDoc(doc(db, "messages", messagesId), {
           messages: arrayUnion({
             sId: userData.id,
@@ -34,35 +36,39 @@ const ChatBox = () => {
             createdAt: new Date(),
           }),
         });
-        const UserIDs = [chatUser.rId, userData.id];
-        UserIDs.forEach(async (id) => {
+        const userIDs = [chatUser.rId, userData.id];
+
+        userIDs.forEach(async (id) => {
           const userChatsRef = doc(db, "chats", id);
           const userChatsSnapshot = await getDoc(userChatsRef);
+
           if (userChatsSnapshot.exists()) {
             const userChatData = userChatsSnapshot.data();
             const chatIndex = userChatData.chatsData.findIndex(
               (c) => c.messageId === messagesId
             );
-            // userChatData.chatsData[chatIndex].lastMessage = input.slice(0, 30);
-            // userChatData.chatsData[chatIndex].updatedAt = Date.now();
+            userChatData.chatsData[chatIndex].lastMessage = input.slice(0, 30);
+            userChatData.chatsData[chatIndex].updatedAt = Date.now();
 
-            // if (userChatData.chatsData[chatIndex].rId === userData.id) {
-            //   userChatData.chatsData[chatIndex].messageSeen = false;
-            // }
-            if (chatIndex !== -1) {
-              userChatData.chatsData[chatIndex].lastMessage = input.slice(
-                0,
-                30
-              );
-              userChatData.chatsData[chatIndex].updatedAt = Date.now();
-              userChatData.chatsData[chatIndex].messageSeen =
-                userChatData.chatsData[chatIndex].rId !== userData.id;
-              await updateDoc(userChatsRef, {
-                chatsData: userChatData.chatsData,
-              });
+            if (userChatData.chatsData[chatIndex].rId === userData.id) {
+              userChatData.chatsData[chatIndex].messageSeen = false;
             }
+            // if (chatIndex !== -1) {
+            //   userChatData.chatsData[chatIndex].lastMessage = input.slice(
+            //     0,
+            //     30
+            //   );
+            //   userChatData.chatsData[chatIndex].updatedAt = Date.now();
+            //   userChatData.chatsData[chatIndex].messageSeen =
+            //     userChatData.chatsData[chatIndex].rId !== userData.id;
+            await updateDoc(userChatsRef, {
+              chatsData: userChatData.chatsData,
+            });
           }
         });
+        // }
+
+        // });
         toast.success("Message sent successfully!");
       }
     } catch (error) {
@@ -74,8 +80,8 @@ const ChatBox = () => {
 
   const sendImage = async (e) => {
     try {
-      const fileUrl = await uploadBytes(e.target.files[0]);
-      if (fileUpdate && messagesId) {
+      const fileUrl = await upload(e.target.files[0]);
+      if (fileUrl && messagesId) {
         await updateDoc((db, "messages", messagesId), {
           messages: arrayUnion({
             sId: userData.id,
@@ -83,8 +89,10 @@ const ChatBox = () => {
             createdAt: new Date(),
           }),
         });
-        const UserIDs = [chatUser.rId, userData.id];
-        UserIDs.forEach(async (id) => {
+
+        const userIDs = [chatUser.rId, userData.id];
+
+        userIDs.forEach(async (id) => {
           const userChatsRef = doc(db, "chats", id);
           const userChatsSnapshot = await getDoc(userChatsRef);
           if (userChatsSnapshot.exists()) {
@@ -125,6 +133,7 @@ const ChatBox = () => {
     if (messagesId) {
       const unSub = onSnapshot(doc(db, "messages", messagesId), (res) => {
         setMessages(res.data().messages.reverse());
+        console.log(res.data().messages.reverse());
       });
       return () => {
         unSub();
@@ -157,12 +166,6 @@ const ChatBox = () => {
             key={index}
             className={msg.sId === userData.id ? "s-msg" : "r-msg"}
           >
-            {msg["image"] ? (
-              <img className="msg-img" src={msg.image} alt="" />
-            ) : (
-              <p className="msg">{msg.text}</p>
-            )}
-
             <div>
               <img
                 src={
@@ -172,6 +175,7 @@ const ChatBox = () => {
                 }
                 alt=""
               />
+              {/* msg.senderid is equal to our userid, then msg is send by me then we will disply avatar and if not matching then diplay reciver image */}
               <p>{convertTimestamp(msg.createdAt)}</p>
             </div>
           </div>;
@@ -181,6 +185,7 @@ const ChatBox = () => {
       <div className="chat-input">
         <input
           onChange={(e) => setInput(e.target.value)}
+          value={input}
           type="text"
           placeholder="Send a message"
         />
@@ -192,9 +197,9 @@ const ChatBox = () => {
           hidden
         />
         <label htmlFor="image" className="image-upload">
-          <img onClick={sendMessage} src={assets.gallery_icon} alt="" />
+          <img src={assets.gallery_icon} alt="" />
         </label>
-        <img src={assets.send_button} />
+        <img onClick={sendMessage} src={assets.send_button} />
       </div>
     </div>
   ) : (
